@@ -30,9 +30,6 @@ trait ActorModuleConfigurable extends ActorModule {
     state(clazz) = to
 }
 
-trait ActorModulePressure extends ActorModuleConfigurable {
-}
-
 object ActorModuleConfigurable {
   def empty: ActorModuleConfigurable = new ActorModuleConfigurable {}
 }

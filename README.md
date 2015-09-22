@@ -84,3 +84,7 @@ Same as `ActorWithModule`, you can as well extract it to custom trait.
 
 ### Other info
 You can't do any more binds outside `initialize` method.
+
+### TODO
+- document module sigleton
+- document how to use fakes, mocks, fixtures...
