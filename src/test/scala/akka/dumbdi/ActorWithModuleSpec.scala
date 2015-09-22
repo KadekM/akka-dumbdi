@@ -58,7 +58,7 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
 
     "children" in {
       val parent = system.actorOf(Props(new SomeGuyWithModule {
-        val child = context.actorOf(Props(new SomeGuyWithdModule), "child")
+        val child = context.actorOf(Props(new SomeGuyWithModule), "child")
       }), "parent")
 
 
@@ -73,7 +73,7 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
 }
 
 trait HisModule extends ActorWithModule { self: Actor =>
-  override protected def initialize(module: ActorModuleConfigurable): Unit = {
+  override protected def moduleInit(module: ActorModuleConfigurable): Unit = {
     module.bind[Service](new NormalService)
   }
 }

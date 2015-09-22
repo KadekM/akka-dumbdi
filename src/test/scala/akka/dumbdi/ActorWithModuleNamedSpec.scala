@@ -60,7 +60,7 @@ class ActorWithModuleNamedSpec(_system: ActorSystem) extends TestKit(_system) wi
 trait HisNamedModule extends ActorWithNamedModule { self: Actor =>
   override protected def moduleConfigLocation: String = "some-guy"
 
-  override protected def initialize(module: ActorModuleConfigurable): Unit = {
+  override protected def moduleInit(module: ActorModuleConfigurable): Unit = {
     module.bind[Service](new NormalService)
   }
 }
@@ -76,7 +76,7 @@ class SomeGuyWithNamedModule extends Actor with HisNamedModule {
 trait HisNamedModuleNotInCfg extends ActorWithNamedModule { self: Actor =>
   override protected def moduleConfigLocation: String = "i-am-not-in-config"
 
-  override protected def initialize(module: ActorModuleConfigurable): Unit = {
+  override protected def moduleInit(module: ActorModuleConfigurable): Unit = {
     module.bind[Service](new NormalService)
   }
 }
@@ -92,7 +92,7 @@ class SomeGuyWithNamedModuleNotInCfg extends Actor with HisNamedModuleNotInCfg {
 trait HisNamedModuleDoesNotExist extends ActorWithNamedModule { self: Actor =>
   override protected def moduleConfigLocation: String = "my-module-does-not-exist"
 
-  override protected def initialize(module: ActorModuleConfigurable): Unit = {
+  override protected def moduleInit(module: ActorModuleConfigurable): Unit = {
     module.bind[Service](new NormalService)
   }
 }

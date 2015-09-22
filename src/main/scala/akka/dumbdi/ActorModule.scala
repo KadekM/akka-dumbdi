@@ -30,6 +30,10 @@ trait ActorModuleConfigurable extends ActorModule {
     state(clazz) = to
 }
 
+object ActorModuleConfigurable {
+  def empty: ActorModuleConfigurable = new ActorModuleConfigurable {}
+}
+
 trait ActorWithModule extends ActorWithNamedModule {
   self: Actor ⇒
   final protected def moduleConfigLocation: String = "/" + context.self.path.elements.drop(1) // drop the parent to look-a-like deployment part
@@ -51,10 +55,9 @@ trait ActorWithNamedModule {
     }
   }
 
-  private val initModule: ActorModuleConfigurable = new ActorModuleConfigurable {}
+  private val userModule = ActorModuleConfigurable.empty
+  protected def moduleInit(module: ActorModuleConfigurable): Unit
+  moduleInit(userModule)
 
-  protected def initialize(module: ActorModuleConfigurable): Unit
-  initialize(initModule)
-
-  lazy protected val module: ActorModule = initModule ++ fromConfigModule
+  lazy protected val module: ActorModule = userModule ++ fromConfigModule
 }
