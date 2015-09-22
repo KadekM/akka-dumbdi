@@ -10,6 +10,12 @@ In a config, if dependency path:
 - is found, but module is not found -> ActorInitializaitonException is thrown
 - is found, and module specified is found -> module is executed and thus can override depenedncies
 
+#### Installation
+```
+libraryDependencies += "com.marekkadek" %% "akka-dumbdi" % "0.0.1"
+```
+
+
 ### ActorWithModule
 You mix this trait if you want to specify dependancy module equal to deployment path:
 ```
