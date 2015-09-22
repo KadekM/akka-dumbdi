@@ -83,8 +83,11 @@ trait HisNamedModule extends ActorWithNamedModule { self: Actor =>
 Same as `ActorWithModule`, you can as well extract it to custom trait.
 
 ### Other info
-You can't do any more binds outside `initialize` method.
+You can't do any more binds outside `initialize` method (type system won't allow you).
 
 ### TODO
-- document module sigleton
-- document how to use fakes, mocks, fixtures...
+- documentation: update with snapshot changes
+- documentation: module sigleton
+- documentation: how to use fakes, mocks, fixtures
+- production: non trivial binds (multiple of same type, named, scoped)
+- tests: conditional, smart binds (in objects modules for tests - for mocking, first being different instance than second (for same interface... for example router with three children with same dependency to Service... we want all three different instances of mock)
