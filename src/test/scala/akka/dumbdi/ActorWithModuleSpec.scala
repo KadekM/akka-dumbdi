@@ -58,7 +58,7 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
 
     "children" in {
       val parent = system.actorOf(Props(new SomeGuyWithModule {
-        val child = context.actorOf(Props(new SomeGuyWithModule), "child")
+        val child = context.actorOf(Props(new SomeGuyWithdModule), "child")
       }), "parent")
 
 
