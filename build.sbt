@@ -13,6 +13,7 @@ scalaVersion := "2.11.7"
 val akkaVersion = "2.4.0-RC3"
 
 libraryDependencies ++= Seq(
+  //"org.scala-lang" % "scala-reflect" % "2.11.7",
   "com.typesafe.akka" %% "akka-actor" % akkaVersion  % Compile,
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion  % Test,
   "org.scalatest" %% "scalatest" % "2.2.4" % Test

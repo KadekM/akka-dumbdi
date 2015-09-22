@@ -30,6 +30,9 @@ trait ActorModuleConfigurable extends ActorModule {
     state(clazz) = to
 }
 
+trait ActorModulePressure extends ActorModuleConfigurable {
+}
+
 object ActorModuleConfigurable {
   def empty: ActorModuleConfigurable = new ActorModuleConfigurable {}
 }
@@ -49,7 +52,15 @@ trait ActorWithNamedModule {
       context.system.settings.config.getString(s"akka.actor.dependency.${moduleConfigLocation}")
     } match {
       case Success(classname) ⇒ // path was found - if module does not exist, crash early
-        Class.forName(classname).newInstance().asInstanceOf[ActorModule]
+        val cl = Class.forName(classname)
+        try { // first look for object
+          val clazz = Class.forName(classname + "$")
+          val obj = clazz.getField("MODULE$").get(cl)
+          obj.asInstanceOf[ActorModule]
+        } catch { // if not found, try to make class
+          case t: Throwable =>
+            cl.newInstance().asInstanceOf[ActorModule]
+        }
       case Failure(_) ⇒ // path was not found - return empty module
         EmptyModule
     }
