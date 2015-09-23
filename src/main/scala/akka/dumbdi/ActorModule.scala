@@ -5,14 +5,16 @@ import akka.actor.Actor
 import scala.reflect.ClassTag
 import scala.util.{ Failure, Success, Try }
 
+private[this] case class Identifier()
+
 trait ActorModule { self ⇒
   protected val state = collection.mutable.HashMap.empty[Class[_], Any]
 
-  final def get[A](implicit ct: ClassTag[A]): A = {
+  def get[A](implicit ct: ClassTag[A]): A = {
     state(ct.runtimeClass).asInstanceOf[A]
   }
 
-  final def ++(other: ActorModule): ActorModule = new ActorModuleConfigurable {
+  def overwriteWith(other: ActorModule): ActorModule = new ActorModuleRuntime {
     for (x ← self.state) bindClassOf(x._1, x._2)
     for (x ← other.state) bindClassOf(x._1, x._2) // overwrites
   }
@@ -22,16 +24,24 @@ trait ActorModule { self ⇒
 
 object EmptyModule extends ActorModule {}
 
-trait ActorModuleConfigurable extends ActorModule {
-  def bind[A](instance: A)(implicit ct: ClassTag[A]) =
+trait ActorModuleRuntime extends ActorModule {
+  def bind[A](instance: A)(implicit ct: ClassTag[A]): Unit = {
     state(ct.runtimeClass) = instance
+  }
 
-  def bindClassOf(clazz: Class[_], to: Any) =
+  def bindClassOf(clazz: Class[_], to: Any): Unit = {
     state(clazz) = to
+  }
 }
 
-object ActorModuleConfigurable {
-  def empty: ActorModuleConfigurable = new ActorModuleConfigurable {}
+trait ActorModuleTest extends ActorModule {
+  def bind[A](instance: A)(implicit ct: ClassTag[A]): Unit = {
+    state(ct.runtimeClass) = instance
+  }
+}
+
+object ActorModuleRuntime {
+  def empty: ActorModuleRuntime = new ActorModuleRuntime {}
 }
 
 trait ActorWithModule extends ActorWithNamedModule {
@@ -49,23 +59,17 @@ trait ActorWithNamedModule {
       context.system.settings.config.getString(s"akka.actor.dependency.${moduleConfigLocation}")
     } match {
       case Success(classname) ⇒ // path was found - if module does not exist, crash early
-        val cl = Class.forName(classname)
-        try { // first look for object
-          val clazz = Class.forName(classname + "$")
-          val obj = clazz.getField("MODULE$").get(cl)
-          obj.asInstanceOf[ActorModule]
-        } catch { // if not found, try to make class
-          case t: Throwable =>
-            cl.newInstance().asInstanceOf[ActorModule]
-        }
+        val module = ReflectionHelpers.getModuleForClassname(classname)
+        module
       case Failure(_) ⇒ // path was not found - return empty module
         EmptyModule
     }
   }
 
-  private val userModule = ActorModuleConfigurable.empty
-  protected def moduleInit(module: ActorModuleConfigurable): Unit
+  private val userModule = ActorModuleRuntime.empty
+  protected def moduleInit(module: ActorModuleRuntime): Unit
   moduleInit(userModule)
 
-  lazy protected val module: ActorModule = userModule ++ fromConfigModule
+  protected val module: ActorModule =
+     userModule overwriteWith fromConfigModule
 }

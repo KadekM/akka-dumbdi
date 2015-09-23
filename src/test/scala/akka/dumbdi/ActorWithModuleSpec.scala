@@ -29,26 +29,26 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
     with WordSpecLike with Matchers with BeforeAndAfterAll {
   def this() = this(ActorSystem("ActorWithModule", Config.cfg))
 
-  override def afterAll {
+  override def afterAll = {
     TestKit.shutdownActorSystem(system)
   }
 
   implicit val timeout = Timeout(3.seconds)
 
-  "WithModule" should {
-    "with cfg" in {
+  "ActorWithModule" should {
+    "be overriden by cfg" in {
       val actor = system.actorOf(Props(new SomeGuyWithModule), "some-guy")
       val value = actor ? "sendback"
       Await.result(value, 3.seconds) shouldBe "fake"
     }
 
-    "without cfg" in {
+    "stay same with missing configuration" in {
       val actor = system.actorOf(Props(new SomeGuyWithModule), "i-am-not-in-config")
       val value = actor ? "sendback"
       Await.result(value, 3.seconds) shouldBe "normal"
     }
 
-    "invalid module name, actor throws exception" in {
+    "throw actor exception for non-existing module" in {
       val actor = system.actorOf(Props(new SomeGuyWithModule), "my-module-does-not-exist")
       val f = actor ? "sendback"
       intercept[TimeoutException] {
@@ -56,7 +56,7 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
       }
     }
 
-    "children" in {
+    "work with children" in {
       val parent = system.actorOf(Props(new SomeGuyWithModule {
         val child = context.actorOf(Props(new SomeGuyWithModule), "child")
       }), "parent")
@@ -73,7 +73,7 @@ class ActorWithModuleSpec(_system: ActorSystem) extends TestKit(_system) with Im
 }
 
 trait HisModule extends ActorWithModule { self: Actor =>
-  override protected def moduleInit(module: ActorModuleConfigurable): Unit = {
+  override protected def moduleInit(module: ActorModuleRuntime): Unit = {
     module.bind[Service](new NormalService)
   }
 }
