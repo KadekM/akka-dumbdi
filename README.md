@@ -12,7 +12,7 @@ In a config, if dependency path:
 
 #### Installation
 ```
-libraryDependencies += "com.marekkadek" %% "akka-dumbdi" % "0.0.1"
+libraryDependencies += "com.marekkadek" %% "akka-dumbdi" % "0.0.2"
 ```
 
 
