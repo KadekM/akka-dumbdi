@@ -90,4 +90,5 @@ You can't do any more binds outside `initialize` method (type system won't allow
 - documentation: module sigleton
 - documentation: how to use fakes, mocks, fixtures
 - production: non trivial binds (multiple of same type, named, scoped)
+- production: nested modules detection
 - tests: conditional, smart binds (in objects modules for tests - for mocking, first being different instance than second (for same interface... for example router with three children with same dependency to Service... we want all three different instances of mock)
